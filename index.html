@@ -25,6 +25,8 @@
             },
             animation: {
               'fade-up': 'fadeUp 0.8s ease-out forwards',
+              'fade-in': 'fadeIn 0.3s ease-out forwards',
+              'zoom-in': 'zoomIn 0.3s ease-out forwards',
               'aurora-1': 'aurora1 12s infinite alternate',
               'aurora-2': 'aurora2 18s infinite alternate',
             },
@@ -32,6 +34,14 @@
               fadeUp: {
                 '0%': { opacity: '0', transform: 'translateY(20px)' },
                 '100%': { opacity: '1', transform: 'translateY(0)' },
+              },
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              zoomIn: {
+                '0%': { opacity: '0', transform: 'scale(0.95)' },
+                '100%': { opacity: '1', transform: 'scale(1)' },
               },
               aurora1: {
                 '0%': { transform: 'translate(0, 0) scale(1)' },
@@ -127,6 +137,36 @@
             RefreshCw, Headphones, DownloadCloud, Crosshair, Menu, X, 
             ChevronRight, Wallet, ShieldCheck, CreditCard 
         } from 'lucide-react';
+
+        // --- COMPONENT: ImageModal (Lightbox) ---
+        const ImageModal = ({ isOpen, onClose, imageSrc }) => {
+            if (!isOpen || !imageSrc) return null;
+
+            return (
+                <div 
+                    className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+                    onClick={onClose}
+                >
+                    <div className="absolute inset-0 bg-black/90 backdrop-blur-sm animate-fade-in" />
+                    
+                    <button 
+                        onClick={onClose}
+                        className="absolute top-4 right-4 text-white hover:text-sb-accent z-[210] transition-colors"
+                    >
+                        <X className="w-8 h-8" />
+                    </button>
+
+                    <div className="relative z-[210] flex items-center justify-center w-full h-full">
+                        <img 
+                            src={imageSrc} 
+                            alt="Zoomed preview" 
+                            className="max-w-full max-h-[90vh] rounded-lg shadow-2xl animate-zoom-in object-contain select-none"
+                            onClick={(e) => e.stopPropagation()} 
+                        />
+                    </div>
+                </div>
+            );
+        };
 
         // --- COMPONENT: PaymentModal ---
         const PaymentModal = ({ isOpen, onClose, onSelectCrypto, onSelectCard }) => {
@@ -258,6 +298,7 @@
         // --- COMPONENT: CardPayment ---
         const CardPayment = ({ onBack }) => {
             const [copied, setCopied] = useState(false);
+            const [selectedImage, setSelectedImage] = useState(null);
             const sessionId = "05c8b2a53b36aa0af0b43010f8677e23f8b8d859cfd065f5dfde5a5fc34dfde33e";
 
             const handleCopy = () => {
@@ -305,9 +346,13 @@
                     {/* PHASE 01 */}
                     <div className="flex flex-col md:flex-row bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300 group">
                         <div className="w-full md:w-[40%] h-56 md:h-auto relative bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
-                        {/* Image Replaces Icon/Gradient */}
-                        <img src="step1%20(2).jpg" alt="Phase 1" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <div className="absolute top-0 left-0 bg-[#050505]/90 border-r border-b border-white/10 px-3 py-2 z-20"><span className="text-xs font-mono text-white tracking-wider">PHASE 01</span></div>
+                        <img 
+                            src="step1%20(2).jpg" 
+                            alt="Phase 1" 
+                            onClick={() => setSelectedImage("step1%20(2).jpg")}
+                            className="w-full h-full object-cover transition-transform duration-500 cursor-pointer hover:scale-105" 
+                        />
+                        <div className="absolute top-0 left-0 bg-[#050505]/90 border-r border-b border-white/10 px-3 py-2 z-20 pointer-events-none"><span className="text-xs font-mono text-white tracking-wider">PHASE 01</span></div>
                         </div>
                         <div className="w-full md:w-[60%] p-6 md:p-8 flex flex-col justify-center">
                         <h3 className="text-xl font-bold text-white mb-4 font-mono">Купете Ваучер от G2A</h3>
@@ -324,9 +369,13 @@
                     {/* PHASE 02 */}
                     <div className="flex flex-col md:flex-row bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all duration-300 group">
                         <div className="w-full md:w-[40%] h-56 md:h-auto relative bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
-                        {/* Image Replaces Icon/Gradient */}
-                        <img src="step2%20(2).jpg" alt="Phase 2" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <div className="absolute top-0 left-0 bg-[#050505]/90 border-r border-b border-white/10 px-3 py-2 z-20"><span className="text-xs font-mono text-white tracking-wider">PHASE 02</span></div>
+                        <img 
+                            src="step2%20(2).jpg" 
+                            alt="Phase 2" 
+                            onClick={() => setSelectedImage("step2%20(2).jpg")}
+                            className="w-full h-full object-cover transition-transform duration-500 cursor-pointer hover:scale-105" 
+                        />
+                        <div className="absolute top-0 left-0 bg-[#050505]/90 border-r border-b border-white/10 px-3 py-2 z-20 pointer-events-none"><span className="text-xs font-mono text-white tracking-wider">PHASE 02</span></div>
                         </div>
                         <div className="w-full md:w-[60%] p-6 md:p-8 flex flex-col justify-center">
                         <h3 className="text-xl font-bold text-white mb-4 font-mono">Вземете Кода</h3>
@@ -341,9 +390,13 @@
                     {/* PHASE 03 */}
                     <div className="flex flex-col md:flex-row bg-gradient-to-br from-white/5 to-red-950/10 border border-[#ff2a2a] shadow-[0_0_30px_rgba(255,42,42,0.15)] rounded-xl overflow-hidden relative group">
                         <div className="w-full md:w-[40%] h-64 md:h-auto relative bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
-                        {/* Image Replaces Icon/Gradient */}
-                        <img src="step3%20(2).jpg" alt="Phase 3" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        <div className="absolute top-0 left-0 bg-[#ff2a2a] px-3 py-2 shadow-lg z-20"><span className="text-xs font-mono text-black font-bold tracking-wider">PHASE 03 // ACTION</span></div>
+                        <img 
+                            src="step3%20(2).jpg" 
+                            alt="Phase 3" 
+                            onClick={() => setSelectedImage("step3%20(2).jpg")}
+                            className="w-full h-full object-cover transition-transform duration-500 cursor-pointer hover:scale-105" 
+                        />
+                        <div className="absolute top-0 left-0 bg-[#ff2a2a] px-3 py-2 shadow-lg z-20 pointer-events-none"><span className="text-xs font-mono text-black font-bold tracking-wider">PHASE 03 // ACTION</span></div>
                         </div>
                         <div className="w-full md:w-[60%] p-6 md:p-8 flex flex-col justify-center">
                         <h3 className="text-xl font-bold text-white mb-4 font-mono flex items-center">
@@ -405,6 +458,11 @@
                     </div>
                     <p className="text-center text-[10px] text-gray-700 font-mono uppercase mt-8">SmartBlock V3 Secure Gateway © {new Date().getFullYear()}</p>
                 </main>
+                <ImageModal 
+                    isOpen={!!selectedImage} 
+                    onClose={() => setSelectedImage(null)} 
+                    imageSrc={selectedImage} 
+                />
                 </div>
             );
         };
@@ -413,6 +471,7 @@
         const Home = ({ onOpenCrypto, onOpenCard }) => {
             const [isModalOpen, setIsModalOpen] = useState(false);
             const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+            const [selectedImage, setSelectedImage] = useState(null);
             
             const handleCryptoSelect = () => { setIsModalOpen(false); onOpenCrypto(); };
             const handleCardSelect = () => { setIsModalOpen(false); onOpenCard(); };
@@ -507,7 +566,12 @@
                                     <p className="text-sm text-gray-400">Свалете файла и го разархивирайте в папка на работния плот.</p>
                                 </div>
                                 <div className="aspect-video bg-black/50 relative flex items-center justify-center overflow-hidden group">
-                                    <img src="step1.jpg" alt="Step 1" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                    <img 
+                                        src="step1.jpg" 
+                                        alt="Step 1" 
+                                        onClick={() => setSelectedImage("step1.jpg")}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:scale-105" 
+                                    />
                                 </div>
                             </div>
 
@@ -518,7 +582,12 @@
                                     <p className="text-sm text-gray-400">Напишете <code className="bg-white/10 px-1 rounded text-white">chrome://extensions</code> в адреса на браузъра.</p>
                                 </div>
                                 <div className="aspect-video bg-black/50 relative flex items-center justify-center overflow-hidden group">
-                                     <img src="step2.jpg" alt="Step 2" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                     <img 
+                                        src="step2.jpg" 
+                                        alt="Step 2" 
+                                        onClick={() => setSelectedImage("step2.jpg")}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:scale-105" 
+                                    />
                                 </div>
                             </div>
 
@@ -529,7 +598,12 @@
                                     <p className="text-sm text-gray-400"><strong className="text-sb-accent">ВАЖНО:</strong> Включете 'Developer mode' (горе вдясно) и веднага натиснете бутона 'Load unpacked'.</p>
                                 </div>
                                 <div className="aspect-video bg-black/50 relative flex items-center justify-center overflow-hidden group">
-                                     <img src="step3.jpg" alt="Step 3" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                     <img 
+                                        src="step3.jpg" 
+                                        alt="Step 3" 
+                                        onClick={() => setSelectedImage("step3.jpg")}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:scale-105" 
+                                    />
                                 </div>
                             </div>
 
@@ -540,7 +614,12 @@
                                     <p className="text-sm text-gray-400">Изберете папката, която разархивирахте в началото.</p>
                                 </div>
                                 <div className="aspect-video bg-black/50 relative flex items-center justify-center overflow-hidden group">
-                                     <img src="step4.jpg" alt="Step 4" className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                     <img 
+                                        src="step4.jpg" 
+                                        alt="Step 4" 
+                                        onClick={() => setSelectedImage("step4.jpg")}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-all duration-300 cursor-pointer hover:scale-105" 
+                                    />
                                 </div>
                             </div>
 
@@ -576,6 +655,11 @@
                     </footer>
                 </div>
                 <PaymentModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onSelectCrypto={handleCryptoSelect} onSelectCard={handleCardSelect} />
+                <ImageModal 
+                    isOpen={!!selectedImage} 
+                    onClose={() => setSelectedImage(null)} 
+                    imageSrc={selectedImage} 
+                />
                 </div>
             );
         };
