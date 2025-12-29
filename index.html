@@ -129,7 +129,7 @@
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
-        import React, { useState } from 'react';
+        import React, { useState, useEffect } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             ArrowLeft, ShoppingCart, Key, Lock, ExternalLink, AlertTriangle, 
@@ -138,31 +138,62 @@
             ChevronRight, Wallet, ShieldCheck, CreditCard 
         } from 'lucide-react';
 
-        // --- COMPONENT: ImageModal (Lightbox) ---
+        // --- COMPONENT: ImageModal (Professional Lightbox) ---
         const ImageModal = ({ isOpen, onClose, imageSrc }) => {
-            if (!isOpen || !imageSrc) return null;
+            const [isClosing, setIsClosing] = useState(false);
+            
+            // Reset closing state when modal opens
+            useEffect(() => {
+                if (isOpen) setIsClosing(false);
+            }, [isOpen]);
+
+            const handleClose = () => {
+                setIsClosing(true);
+                // Wait for animation to finish before calling parent onClose
+                setTimeout(() => {
+                    onClose();
+                    setIsClosing(false);
+                }, 300);
+            };
+
+            // Don't render if not open and not currently animating out
+            if (!isOpen && !isClosing) return null;
 
             return (
                 <div 
-                    className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-                    onClick={onClose}
+                    className={`fixed inset-0 z-[200] flex items-center justify-center p-4 transition-opacity duration-300 ease-in-out ${
+                        isClosing ? 'opacity-0' : 'opacity-100'
+                    }`}
+                    onClick={handleClose}
                 >
-                    <div className="absolute inset-0 bg-black/90 backdrop-blur-sm animate-fade-in" />
+                    {/* Backdrop */}
+                    <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" />
                     
+                    {/* Close Button */}
                     <button 
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-white hover:text-sb-accent z-[210] transition-colors"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleClose();
+                        }}
+                        className="absolute top-4 right-4 text-white/70 hover:text-sb-accent z-[210] transition-colors duration-200"
                     >
                         <X className="w-8 h-8" />
                     </button>
 
-                    <div className="relative z-[210] flex items-center justify-center w-full h-full">
-                        <img 
-                            src={imageSrc} 
-                            alt="Zoomed preview" 
-                            className="max-w-full max-h-[90vh] rounded-lg shadow-2xl animate-zoom-in object-contain select-none"
-                            onClick={(e) => e.stopPropagation()} 
-                        />
+                    {/* Image Container - Floating Card Style */}
+                    <div 
+                        className={`relative z-[210] max-w-5xl w-full max-h-[85vh] flex items-center justify-center transition-all duration-300 ease-out ${
+                            isClosing ? 'scale-95 opacity-0' : 'scale-100 opacity-100 animate-zoom-in'
+                        }`}
+                        onClick={(e) => e.stopPropagation()} 
+                    >
+                        <div className="relative rounded-xl overflow-hidden border border-white/20 shadow-2xl bg-black/50">
+                           <img 
+                              src={imageSrc || ''} 
+                              alt="Zoomed preview" 
+                              className="w-full h-full object-contain max-h-[85vh] select-none block"
+                           />
+                        </div>
                     </div>
                 </div>
             );
